@@ -46,7 +46,24 @@ fn perm(path: &str) -> String{
     }
     return words;
 }
-fn combine_with_spaces(list_input_1: &str, list_input_2: &str) -> String{
+fn perm_space(path: &str) -> String{
+    let mut words : String  = String::from("");
+    let I1 = fs::read_to_string(&path).expect("unable to read");
+    let I2 = fs::read_to_string(&path).expect("unable to read");
+    for line in I1.lines(){
+        let mut linef:String= String::from("");
+        for line2 in I2.lines(){
+            linef.push_str(&line);
+            linef.push_str(" ");
+            linef.push_str(&line2);
+            linef.push_str("\n");
+        }
+
+        words.push_str(&linef);
+    }
+    return words;
+}
+fn combine_with_space(list_input_1: &str, list_input_2: &str) -> String{
     let mut output = String::from("");
     let I1 = fs::read_to_string(list_input_1).expect("unable to read file 1");
     let I2 = fs::read_to_string(list_input_2).expect("unable to read file 2");
@@ -63,9 +80,15 @@ fn combine_with_spaces(list_input_1: &str, list_input_2: &str) -> String{
     return output; 
 
 }
+
 fn combine_all(list_input_1: &str, list_input_2: &str) -> String{
     let mut all = combine(&list_input_1, &list_input_2);
     all.push_str(&combine(list_input_2, list_input_1));
+    return all; 
+}
+fn combine_all_with_space(list_input_1: &str, list_input_2: &str) -> String{
+    let mut all = combine_with_space(&list_input_1, &list_input_2);
+    all.push_str(&combine_with_space(list_input_2, list_input_1));
     return all; 
 }
 fn copy_file_contents(file_path: &str, list_input: &str){
@@ -151,7 +174,7 @@ fn main() {
                 .long("mode")
                 .aliases([ "M","MODE"])
                 .required(true)
-                .help("Options: left, right, all_space, all, perm")
+                .help("Options:\nleft,left_space, right, right_space\nall, all_space\nperm, perm_space\npattern")
             )
         .arg(
             Arg::new("Pattern")
@@ -185,18 +208,19 @@ fn main() {
             ).get_matches();
     let mode =  res.get_one::<String>("Mode").unwrap(); 
     let file_path_1 = res.get_one::<String>("File Path 1").unwrap();
-    let file_path_2 = res.get_one::<String>("File Path 2").unwrap();
     let output_file = res.get_one::<String>("Output File").unwrap();
         match mode.as_str(){
-            "left" => write_file(combine(&file_path_1,&file_path_2).as_str(), &output_file), 
-            "right" => write_file(&combine(&file_path_2, &file_path_1), &output_file),
-            "all_space" => write_file(&combine_with_spaces(&file_path_1, &file_path_2), &output_file),
-            "all" => write_file(&combine_all(&file_path_1, &file_path_2), &output_file),
-            "pattern" => pattern(&res.get_one::<String>("Pattern").unwrap(), &file_path_1, &file_path_2, &output_file),
+            "left" => write_file(combine(&file_path_1,&res.get_one::<String>("File Path 2").unwrap()).as_str(), &output_file), 
+            "right" => write_file(&combine(&res.get_one::<String>("File Path 2").unwrap(), &file_path_1), &output_file),
+            "left_space" => write_file(&combine_with_space(&file_path_1, &res.get_one::<String>("File Path 2").unwrap()), &output_file),
+            "right_space" => write_file(&combine_with_space(&res.get_one::<String>("File Path 2").unwrap(), &file_path_1), &output_file),
+            "all_space" => write_file(&combine_all_with_space(&file_path_1, &res.get_one::<String>("File Path 2").unwrap()), &output_file),
+            "all" => write_file(&combine_all(&file_path_1, &res.get_one::<String>("File Path 2").unwrap()), &output_file),
+            "pattern" => pattern(&res.get_one::<String>("Pattern").unwrap(), &file_path_1, &res.get_one::<String>("File Path 2").unwrap(), &output_file),
             "perm" => perm_write(&file_path_1, &output_file),
+            "perm_space" => write_file(&perm_space(&file_path_1),&output_file),
             _ => println!("Invalid mode")
             
     }
-  println!("{}", mode);
-  //combine_all("list_input_1.txt", "list_input_2.txt", "list_output.txt"); 
+  println!("The cat put your list in {} using {} mode",output_file, mode);
 }
