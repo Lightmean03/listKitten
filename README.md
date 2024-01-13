@@ -36,8 +36,12 @@ listKitten accepts the following command-line options:
 - **Mode (`-m` or `--mode`):** Specify the mode of operation. Choose from the following options:
   - `left`: Combine the first list with the second list.
   - `right`: Combine the second list with the first list.
+  - `left_space`: Combine the first list with the second list with space.
+  - `right_space`: Combine the second list with the first list with space.
   - `all_space`: Combine the lists with a space between each word.
   - `all`: Combine the lists in both directions.
+  - `perm`: all combinations of a single list
+  - `perm_space`: all combinations of a single list with spaces 
   - `pattern`: Apply a specific pattern to manipulate the lists.
 
 - **Pattern (`-p` or `--pattern`):** Specify a pattern when using the `pattern` mode. The pattern can include:
